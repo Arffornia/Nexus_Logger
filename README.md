@@ -1,17 +1,31 @@
-# Typescript Template
+# Nexus Logger
 
-This package lets you manage the variables you want to save and reload.
+This package lets you log any message you want.
 
 ## Install : 
 
-To include Typescript Template in your project, you can install it using npm:
+To include Nexus Logger in your project, you can install it using npm:
 ```bash
-npm i @the_gost_sniper/typescript_template
+npm i @arffornia/nexus_logger
 ```
 
-## Usage : 
+## Usage :
 
-TODO
+#### Init 
+At the beginning, you must initialize an instance of NexusLogger with the path of the save file :
+
+```typescript
+const logger = new NexusLogger(loggerFilePath);
+```
+
+#### Log a message : 
+
+You can choose different prefix for your log message:
+- [Debug]\: `logger.debug(message)` 
+- [Info]\: `logger.info(message)`
+- [Warn]\: `logger.warn(message)`
+- [Error]\: `logger.error(message)`
+
 
 ## Tests
 

@@ -53,7 +53,24 @@ export class NexusLogger {
     private writeGenericLog(message: string, level: LogLevel): void {
         const timestamp = new Date().toISOString();
         const formattedMsg = `[${timestamp}] [${this.logPrefix}] [${level}]: ${message}`;
-        console.error(formattedMsg); 
+
+        switch (level) {
+            case LogLevel.DEBUG:
+                console.debug(formattedMsg);
+                break;
+            case LogLevel.INFO:
+                console.info(formattedMsg);
+                break;
+            case LogLevel.WARN:
+                console.warn(formattedMsg);
+                break;
+            case LogLevel.ERROR:
+                console.error(formattedMsg);
+                break;
+            default:
+                break;
+        }
+
         this.enqueueLog(formattedMsg);
     }
 

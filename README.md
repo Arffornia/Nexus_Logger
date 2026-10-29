@@ -31,7 +31,25 @@ logger.error('Error message');
 Each line looks like `[2026-10-29T10:00:00.000Z] [MyApp] [INFO]: Info message`. It goes to the matching
 `console.*` method and is appended to the file through an internal queue, so writes keep their order.
 
-The log file is created (and emptied) when the logger is constructed.
+### Options
+
+An optional third argument configures rotation and redaction:
+
+```ts
+const logger = new NexusLogger('./launcher_log.txt', 'MyApp', {
+    // Previous sessions to keep (default 3). On start, a non-empty launcher_log.txt becomes
+    // launcher_log.1.txt, .1 becomes .2, ... and the oldest is deleted. 0 = just empty the file.
+    maxPreviousLogs: 3,
+
+    // Applied to every message before it reaches the console or the file.
+    redact: (message) => message.replace(/(--accessToken\s+)\S+/g, '$1[REDACTED]'),
+});
+```
+
+If `redact` throws (or returns a non-string), the line is written as
+`[message hidden: redact callback failed]`: the raw message is never written.
+
+The current log file is always created empty when the logger is constructed, after rotation.
 
 ## Commands
 

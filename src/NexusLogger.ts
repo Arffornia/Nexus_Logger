@@ -1,3 +1,4 @@
+import { writeFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 
 enum LogLevel {
@@ -19,9 +20,10 @@ export class NexusLogger {
         this.initLogFile();
     }
 
-    private async initLogFile(): Promise<void> {
+    // Synchronous on purpose: the file must be ready before the first queued write (same as published 1.0.2)
+    private initLogFile(): void {
         try {
-            await writeFile(this.logFilePath, '', { flag: 'w' });
+            writeFileSync(this.logFilePath, '', { flag: 'w' });
         } catch (error) {
             console.error(`[Logger Error]: Unable to initialize log file. Details: ${error.message}`);
         }

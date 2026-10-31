@@ -1,45 +1,56 @@
 # Nexus Logger
 
-This package lets you log any message you want.
+`@arffornia/nexus_logger` is a small logger that prints timestamped, levelled messages to the console and appends
+them to a log file. It is part of the Arffornia ecosystem: the
+[Arffornia launcher](https://github.com/Arffornia/Arffornia_Launcher_V.5.2) uses it for `launcher_log.txt`, the file
+players share when they ask for support. Architecture docs (coming soon): https://arffornia.github.io/docs/
 
-## Install : 
+## Requirements
 
-To include Nexus Logger in your project, you can install it using npm:
+- Node.js 22 (CI runs on 22)
+
+## Install
+
 ```bash
 npm i @arffornia/nexus_logger
 ```
 
-## Usage :
+## Usage
 
-#### Init 
-At the beginning, you must initialize an instance of NexusLogger with the path of the save file :
+```ts
+import { NexusLogger } from '@arffornia/nexus_logger';
 
-```typescript
-const logger = new NexusLogger(loggerFilePath);
+const logger = new NexusLogger('./launcher_log.txt', 'MyApp'); // prefix is optional (default: NexusLogger)
+
+logger.debug('Debug message');
+logger.info('Info message');
+logger.warn('Warn message');
+logger.error('Error message');
 ```
 
-#### Log a message : 
+Each line looks like `[2026-10-29T10:00:00.000Z] [MyApp] [INFO]: Info message`. It goes to the matching
+`console.*` method and is appended to the file through an internal queue, so writes keep their order.
 
-You can choose different prefix for your log message:
-- [Debug]\: `logger.debug(message)` 
-- [Info]\: `logger.info(message)`
-- [Warn]\: `logger.warn(message)`
-- [Error]\: `logger.error(message)`
+The log file is created (and emptied) when the logger is constructed.
 
+## Commands
 
-## Tests
+| Command | What it does |
+|---|---|
+| `npm ci` | Install the exact dependency tree from `package-lock.json` |
+| `make check` | Type-check, run the tests, build (what CI runs) |
+| `make test` / `npm test` | Run the Jest tests |
+| `make build` / `npm run build` | Compile to `dist/` (`tsc` + `tsc-alias`) |
 
-Tests are managed by **Jest** 
+## Configuration
 
-You can run the tests using :
+None. The file path and prefix are constructor arguments. No environment variables are read.
 
-```bash
-npm test
-```
+## Release process
+
+Releases are done by the maintainer: bump `version` in `package.json` in a PR, merge, then publish the merged
+commit to npm and tag it `v<version>`. Contributors never publish.
 
 ## License
 
-This project is licensed under the MIT licence. You can consult the complete text of the licence in the file [LICENSE](LICENSE).
-
-
-
+MIT, see [LICENSE](LICENSE).

@@ -14,7 +14,7 @@ Main consumer: the Arffornia launcher (`Arffornia/Arffornia_Launcher_V.5.2`, `sr
 | Path | What |
 |---|---|
 | `src/index.ts` | Public exports |
-| `src/NexusLogger.ts` | The logger (file init, write queue, levels) |
+| `src/NexusLogger.ts` | The logger (rotation, file init, redaction, write queue, levels) and `NexusLoggerOptions` |
 | `tests/*.test.ts` | Jest tests |
 | `dist/` | Build output (ignored; `main` is `dist/index.js`) |
 
@@ -43,16 +43,18 @@ make build      # tsc && tsc-alias -> dist/
 
 ## Testing strategy
 
+- `tests/rotation.test.ts`, `tests/redaction.test.ts`, `tests/initLogFile.test.ts` cover the options and init.
 - Tests write into a temp dir (`fs.mkdtempSync(os.tmpdir() …)`), never into the repo.
 - File writes are asynchronous: wait for the queue to drain (poll the file) before asserting its content.
 
 ## Gotchas (from the 2026-10-29 audit)
 
-- Version drift: `package.json` says 1.0.0 but npm has 1.0.2, whose `dist` initialises the file with
-  `writeFileSync`; `src/` still uses an async `writeFile` that can race with the first writes.
-- The file is truncated on every start, so the previous session (often the crash) is lost. No rotation.
-- No redaction: the launcher forwards third-party debug output that can contain tokens.
-- `fs` and `path` are listed as npm dependencies (placeholder packages). Node built-ins are what is used.
+- Keep `src/` the only source of what is on npm: 1.0.1/1.0.2 were once published from unpushed code (sync
+  `initLogFile`). The constructor must prepare the file synchronously, before the first queued write.
+- Rotation (`maxPreviousLogs`, default 3) and file init run synchronously in the constructor, before any write.
+- `redact` must run before *both* console and file output, and a failing callback must never let the raw
+  message through. The launcher relies on it to strip the Minecraft access token from MCLC debug lines.
+- Never add `fs`/`path` (or other Node built-ins) to `dependencies`: they resolve to unrelated npm packages.
 
 ## Related repos
 

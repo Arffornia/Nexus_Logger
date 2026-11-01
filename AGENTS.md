@@ -48,11 +48,11 @@ make build      # tsc && tsc-alias -> dist/
 
 ## Gotchas (from the 2026-10-29 audit)
 
-- Version drift: `package.json` says 1.0.0 but npm has 1.0.2, whose `dist` initialises the file with
-  `writeFileSync`; `src/` still uses an async `writeFile` that can race with the first writes.
+- Keep `src/` the only source of what is on npm: 1.0.1/1.0.2 were once published from unpushed code (sync
+  `initLogFile`). The constructor must prepare the file synchronously, before the first queued write.
 - The file is truncated on every start, so the previous session (often the crash) is lost. No rotation.
 - No redaction: the launcher forwards third-party debug output that can contain tokens.
-- `fs` and `path` are listed as npm dependencies (placeholder packages). Node built-ins are what is used.
+- Never add `fs`/`path` (or other Node built-ins) to `dependencies`: they resolve to unrelated npm packages.
 
 ## Related repos
 
